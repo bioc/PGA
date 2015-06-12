@@ -1,0 +1,179 @@
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{PGA tutorial}
+%\VignetteKeywords{Proteomics, Proteogenomics, RNA-Seq,LC/MSMS,Protein identification}
+%\VignettePackage{PGA}
+
+\documentclass[12pt]{article}
+
+<<style, eval=TRUE, echo=FALSE, results='asis'>>=
+BiocStyle::latex()
+@
+
+
+\bioctitle[\Biocpkg{PGA} introduction]{A short tutorial on using \Biocpkg{PGA} for protein identification based on the database derived from RNA-Seq data}
+
+
+\author{Bo Wen}
+
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+<<env, echo=FALSE,warning=FALSE,message=FALSE>>=
+suppressPackageStartupMessages(library("PGA"))
+#suppressPackageStartupMessages(library("R.utils"))
+@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------------
+\section{Introduction}\label{sec:intro} 
+%------------------------------------------------------------------
+
+The data of mass spectrometry (MS)-based proteomics is generally achieved by peptide identification through comparison of the experimental mass spectra with the theoretical mass spectra that are derived from a reference protein database, however, this strategy could not identify new peptide and protein sequences that are absent from a reference database. The customized protein databases on the basis of RNA-Seq data was proposed to assist and improve identification of such novel peptides. In addition, the strategy based on searching this database can improve the sensitivity of the peptide identification. The \Biocpkg{PGA} package provides functions for construction of customized protein databases based on RNA-Seq data, database searching, post-processing and report generation. This kind of customized protein database includes both the reference database (such as Refseq or ENSEMBL) and the novel peptide sequences form RNA-Seq data. In general, customized protein database includes the following four kind of new peptides (or proteins):1) Single nucleotide variation (SNV) caused peptides; 2) Short insertion and deletion (INDEL) caused peptides; 3) Alternative splicing caused peptides; 4) Novel transcripts codeing peptides.  This document describes how to use the functions included in the R package \Biocpkg{PGA}.
+
+
+%------------------------------------------------------------------
+\section{Construction of customized protein databases based on RNA-Seq data}
+%------------------------------------------------------------------
+
+
+\subsection{Preparing annotation files}
+
+In order to translate the RNA-Seq information to peptide sequences, the users need to download numerous pieces of genome annotation information. There are two functions in \Biocpkg{PGA} to prepare these information: \Rfunction{PrepareAnnotationRefseq2} and \Rfunction{PrepareAnnotationEnsembl2}. The methods  are similar with functions \Rfunction{PrepareAnnotationRefseq} and \Rfunction{PrepareAnnotationEnsembl} in \Biocpkg{customProDB} \cite{customProDB} with several changes. However, the usage of these functions are the same with those in \Biocpkg{customProDB}. 
+
+
+\subsection{Building database from RNA-Seq data}
+Building a comprehensive customized protein databases based on RNA-Seq data by using \Rpackage{PGA}, the users usually need to provide three files:
+\begin{enumerate}
+    \item a VCF format file which contains SNV or INDEL information;
+    \item a BED format file which contains splice junctions information;
+    \item a GTF format file which contains novel transcripts information.
+\end{enumerate}
+The above files provide almost all of the events which generate potential novel peptides from RNA-Seq data.
+
+<<bdb, eval=TRUE, warning=FALSE, message=FALSE>>=
+vcffile <- system.file("extdata/input", "PGA.vcf",package="PGA")
+bedfile <- system.file("extdata/input", "junctions.bed",package="PGA")
+gtffile <- system.file("extdata/input", "transcripts.gtf",package="PGA")
+annotation <- system.file("extdata", "annotation",package="PGA")
+outfile_path<-"db/"
+outfile_name<-"test"
+library(BSgenome.Hsapiens.UCSC.hg19)
+dbfile <- dbCreator(gtfFile=gtffile,vcfFile=vcffile,bedFile=bedfile,
+                    annotation_path=annotation,outfile_name=outfile_name,
+                    genome=Hsapiens,outdir=outfile_path)
+@
+For each kind of event mentioned above, two files are generated. One is a FASTA format file and the other is a file with a .tab suffix. The latter contains the detailed information about novel peptides . Except these files, a combined FASTA format file is generated. This is the final customized protein database which will be used for database searching. If the parameter \textbf{"make\_decoy"} in \Rfunction{dbCreator} function is set \textbf{"TRUE"} (This is the default value for parameter \textbf{"make\_decoy"}), this file will contain the decoy sequences. 
+
+%------------------------------------------------------------------
+\section{MS/MS data searching}
+%------------------------------------------------------------------
+
+After the customized protein database constructed, \Biocpkg{rTANDEM} package \cite{rTANDEM} is adopted to search the database against tandem mass spectra to detect peptides. \Biocpkg{rTANDEM} package interfaces with the popular used open source search engine \software{X!Tandem} \cite{tandem} algorithm in R.
+
+<<databasesearching, echo=TRUE, cache=FALSE, tidy=FALSE,eval=TRUE, warning=FALSE, message=FALSE>>=
+msfile <- system.file("extdata/input", "pga.mgf",package="PGA")
+idfile <- runTandem(spectra = msfile, fasta = dbfile, outdir = "./", cpu = 6,
+                    enzyme = "[KR]|[X]", varmod = "15.994915@M",itol = 0.05,
+                    fixmod = "57.021464@C", tol = 10, tolu = "ppm",
+                    itolu = "Daltons", miss = 2, maxCharge = 8, ti = FALSE)
+
+@
+
+The results are written in xml format to the directory specified and will be loaded for further processing.
+
+%------------------------------------------------------------------
+\section{Post-processing}
+%------------------------------------------------------------------
+
+After the MS/MS data searching, the function \Rfunction{parserGear} can be used to parse the search result. It calculates the q-value for each peptide spectrum matches (PSMs) and then utilizes the Occam's razor approach \cite{Nesvizhskii2003} to deal with degenerated wild peptides by finding a minimum subset of proteins that covered all of the identified wild peptides. 
+
+<<parserGear, echo=TRUE, cache=FALSE, tidy=FALSE, eval=TRUE, warning=FALSE, message=FALSE>>=
+parserGear(file = idfile, db = dbfile, decoyPrefix="#REV#",xmx=1,thread=8,
+           outdir = "parser_outdir")
+
+@
+
+It exports some tab-delimited files containing the peptide identification 
+result and protein identification result. The annotated spectra for 
+the identified novel peptides which pass the threshold are exported.
+
+This function also accepts the "raw" Mascot result file as input(dat 
+format). For instance,
+<<mascotParser, eval=FALSE, echo=TRUE, cache=FALSE, tidy=FALSE, warning=FALSE, message=FALSE>>=
+dat_file<-"mascot_raw.dat"
+parserGear(file = dat_file, db = dbfile, decoyPrefix="#REV#",xmx=1,thread=8,
+           outdir = "parser_outdir")
+@
+Unfortunately,we don't offer the wrapper function for Mascot 
+search under current conditions. So you have to launch the independent
+identification by Mascot.
+
+%------------------------------------------------------------------
+\section{HTML-based report generation}
+%------------------------------------------------------------------
+
+The results are then summarised and compiled into an interactive HTML report.
+
+<<reportg, echo=TRUE, cache=FALSE, tidy=FALSE, eval=TRUE, warning=FALSE, message=FALSE>>=
+reportGear(parser_dir = "parser_outdir", tab_dir = outfile_path,
+           report_dir = "report")
+@
+
+After the analysis has completed, the file \file{index.html} in the output directory can be opened in a web browser to access report generated. In general, this report will show the identification result for four kind of novel peptides, such as SNV-caused peptides, INDEL-caused peptides, alternative splicing caused peptides and novel transcripts codeing peptides.
+
+%------------------------------------------------------------------
+\section{Integrated function \Rfunction{easyRun}}
+%------------------------------------------------------------------
+
+The function \Rfunction{easyRun} automates the data analysis process. 
+It will process the dataset in the following way:
+
+\begin{enumerate}
+\item Customized protein database construction
+\item MS/MS searching
+\item Post-processing
+\item HTML-based report generation
+\end{enumerate}
+
+This function can be called as following:
+<<auto, echo=TRUE, cache=FALSE, tidy=FALSE, eval=TRUE, warning=FALSE, message=FALSE>>=
+vcffile <- system.file("extdata/input", "PGA.vcf",package="PGA")
+bedfile <- system.file("extdata/input", "junctions.bed",package="PGA")
+gtffile <- system.file("extdata/input", "transcripts.gtf",package="PGA")
+annotation <- system.file("extdata", "annotation",package="PGA")
+library(BSgenome.Hsapiens.UCSC.hg19)
+msfile <- system.file("extdata/input", "pga.mgf",package="PGA")
+easyRun(gtfFile=gtffile,vcfFile=vcffile,bedFile=bedfile,spectra=msfile,
+        annotation_path=annotation,genome=Hsapiens,cpu = 6,
+        enzyme = "[KR]|[X]", varmod = "15.994915@M",itol = 0.05,
+        fixmod = "57.021464@C", tol = 10, tolu = "ppm", itolu = "Daltons",
+        miss = 2, maxCharge = 8, ti = FALSE,xmx=1)
+@
+After the analysis has completed, the file \file{index.html} in the output directory can be opened in a web browser to access report generated.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Session information}\label{sec:sessionInfo} 
+
+All software and respective versions used to produce this document are listed below.
+
+<<sessioninfo, results='asis', echo=FALSE>>=
+toLatex(sessionInfo())
+@
+
+\bibliography{PGA}
+
+\end{document}

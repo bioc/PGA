@@ -1,0 +1,38 @@
+import(data.table)
+import(pheatmap)
+import(RCurl)
+import(Nozzle.R1)
+import(stringr)
+import(ggplot2)
+import(IRanges)
+import(GenomicRanges)
+importFrom(Biostrings,
+    AAStringSet, DNAStringSet, DNAStringSetList, DNA_BASES, getSeq ,
+    nchar, reverseComplement, substr, translate)
+import(Rsamtools)
+importFrom(GenomicFeatures,exonsBy,makeTxDbFromGFF,extractTranscriptSeqs)
+import(RSQLite)
+importFrom(rtracklayer,browserSession, ucscTableQuery,
+                    tableNames, getTable, trackNames, ucscSchema,import,export)
+importFrom(biomaRt, getBM, listAttributes, listDatasets, listMarts,
+           useDataset, useMart)
+
+importFrom(GenomicFeatures, cdsBy, exons, transcripts,makeTxDbFromUCSC,
+    fiveUTRsByTranscript, threeUTRsByTranscript)
+
+importFrom(VariantAnnotation, scanVcf, scanVcfHeader, samples)
+importFrom(AnnotationDbi, loadDb, saveDb)
+importFrom(customProDB,aaVariation,Bed2Range,InputVcf,JunctionType,
+           OutputNovelJun,Outputproseq,OutputVarproseq,
+           OutputVarproseq_single,Positionincoding,
+           PrepareAnnotationEnsembl,Varlocation)
+importFrom(rTANDEM, rTParam, rTTaxo, setParamValue, tandem)
+
+
+export(dbCreator)
+export(reportGear)
+export(runTandem)
+export(parserGear)
+export(easyRun)
+export(PrepareAnnotationEnsembl2)
+export(PrepareAnnotationRefseq2)
