@@ -1027,13 +1027,11 @@ getNovelTx=function(gffFile="transcripts.gtf",
     # Make a TxDb object from annotations available as a GFF3 or GTF file
     #txdb <- makeTxDbFromGFF(file=tmpgff,format="gtf",
     #                        exonRankAttributeName="exon_number",
-    #                        species=species,
-    #                        circ_seqs=names(chromLen))
+    #                        species=species)
     
     txdb <- makeTxDbFromGFF(file=tmpgff,format="gtf",
                             #exonRankAttributeName="exon_number",
-                            organism=organism,
-                            circ_seqs=names(chromLen))
+                            organism=organism)
     
     #if(interactive()) {
     #saveDb(txdb,file="TESTGTF.sqlite")
