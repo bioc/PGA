@@ -990,7 +990,7 @@ getNovelTx=function(gffFile="transcripts.gtf",
     
     chromLen<-seqlengths(genome)
     #######filter
-    gff <- import(gffFile,asRangedData=FALSE)
+    gff <- import(gffFile)
     novel_gff<-gff[substr(gff$transcript_id,1,5) =="CUFF."]
     
     #justify the chromosomes are ucsc format or ensembl format
