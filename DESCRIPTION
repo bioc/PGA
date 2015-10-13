@@ -8,7 +8,7 @@ Description: This package provides functions for construction of
         customized protein database includes both the reference
         database (such as Refseq or ENSEMBL) and the novel peptide
         sequences form RNA-Seq data.
-Version: 0.99.11
+Version: 1.0.0
 Date: 2014-12-31
 Author: Shaohang Xu, Bo Wen
 Maintainer: Bo Wen <wenbo@genomics.cn>, Shaohang Xu
