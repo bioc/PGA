@@ -4,6 +4,7 @@ import(RCurl)
 import(Nozzle.R1)
 import(stringr)
 import(ggplot2)
+import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
 importFrom(Biostrings,
