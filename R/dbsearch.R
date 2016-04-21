@@ -1,3 +1,16 @@
+# https://stackoverflow.com/questions/34030087/how-to-find-correct-executable-with-sys-which-on-windows
+Sys.which2 <- function(cmd) {
+    stopifnot(length(cmd) == 1)
+    if (.Platform$OS.type == "windows") {
+        suppressWarnings({
+            pathname <- shell(sprintf("where %s 2> NUL", cmd), intern=TRUE)[1]
+        })
+        if (!is.na(pathname)) return(dQuote(setNames(pathname, cmd)))
+    }
+    Sys.which(cmd)
+}
+
+.java.executable <- function() Sys.which2('java')
 
 #' run X!Tandem
 #'
@@ -7,7 +20,7 @@
 #' @param fasta Protein database file for searching.
 #' @param outdir The output directory.
 #' @param cpu The number of CPU used for X!Tandem search. Default is 1.
-#' @param enzyme Specification of specific protein cleavage sites. 
+#' @param enzyme Specification of specific protein cleavage sites.
 #' Default is "[KR]|[X]".
 #' @param varmod Specificiation of potential modifications of residues.
 #' @param fixmod Specification of modifications of residues.
@@ -17,11 +30,11 @@
 #' @param itolu Unit for fragment ion mass tolerance (monoisotopic mass).
 #' @param miss The number of missed cleavage sites. Default is 2.
 #' @param maxCharge The Maximum parent charge, default is 8
-#' @param ti anticipate carbon isotope parent ion assignment errors. 
+#' @param ti anticipate carbon isotope parent ion assignment errors.
 #' Default is false.
 #' @return The search result file path
 #' @export
-#' @examples 
+#' @examples
 #' vcffile <- system.file("extdata/input", "PGA.vcf",package="PGA")
 #' bedfile <- system.file("extdata/input", "junctions.bed",package="PGA")
 #' gtffile <- system.file("extdata/input", "transcripts.gtf",package="PGA")
@@ -32,7 +45,7 @@
 #' dbfile <- dbCreator(gtfFile=gtffile,vcfFile=vcffile,bedFile=bedfile,
 #'                     annotation_path=annotation,outfile_name=outfile_name,
 #'                     genome=Hsapiens,outdir=outfile_path)
-#'           
+#'
 #' msfile <- system.file("extdata/input", "pga.mgf",package="PGA")
 #' runTandem(spectra = msfile, fasta = dbfile, outdir = "./", cpu = 6,
 #'           enzyme = "[KR]|[X]", varmod = "15.994915@@M",
@@ -53,26 +66,26 @@ runTandem<-function(spectra="",fasta="",outdir=".",cpu=1,
     {
         fixmod="57.021464@C"
     }
-    
+
     if(tolu!="ppm"){
         tolu="Daltons"
     }
     if(itolu!="ppm"){
         itolu="Daltons"
     }
-    
+
     if(ti){
         ti="yes"
     }else{
         ti="no"
     }
-    
+
     taxonomy=rTTaxo(taxon="sapfasta",format="peptide",URL=fasta)
     outxmlname=paste(outdir,"/",basename(spectra),"_xtandem.xml",
                      collapse="",sep="")
     #cat(outxmlname,"\n")
     param <- rTParam()
-    
+
     param <- setParamValue(param, 'list path','taxonomy information',taxonomy)
     param <- setParamValue(param, 'protein', 'taxon', value="sapfasta")
     param <- setParamValue(param, 'list path', 'default parameters',
@@ -120,23 +133,23 @@ runTandem<-function(spectra="",fasta="",outdir=".",cpu=1,
                            value=varmod)
     param <- setParamValue(param,"residue","modification mass",value=fixmod)
     result.path <- tandem(param)
-    
-    return(result.path)  
+
+    return(result.path)
 }
 
 
 #' @title Post-processing for the identification result
-#' @description This function is mainly for q-value calculation, 
+#' @description This function is mainly for q-value calculation,
 #' protein inference and novel peptides spectra annotation.
-#' @param file MS/MS search file. Currently, only XML format file 
-#' of X!Tandem, DAT result of Mascot and mzIdentML result file (MS-GF+, 
-#' MyriMatch, IPeak, OMSSA, ...) are supported. 
-#' @param db A FASTA format database file used for MS/MS searching. 
+#' @param file MS/MS search file. Currently, only XML format file
+#' of X!Tandem, DAT result of Mascot and mzIdentML result file (MS-GF+,
+#' MyriMatch, IPeak, OMSSA, ...) are supported.
+#' @param db A FASTA format database file used for MS/MS searching.
 #' Usually, it is from the output of the function \code{dbCreator}.
-#' @param outdir Output directory. 
+#' @param outdir Output directory.
 #' @param prefix The prefix of output file.
-#' @param novelPrefix The prefix of novel protein ID. Default is "VAR". 
-#' "VAR" is the prefix which used by function \code{dbCreator}. This value 
+#' @param novelPrefix The prefix of novel protein ID. Default is "VAR".
+#' "VAR" is the prefix which used by function \code{dbCreator}. This value
 #' should be left to the default when your database is constructed by
 #' the function \code{getTrinityDB}.
 #' @param decoyPrefix The prefix of decoy sequences ID. Default is "###REV###".
@@ -151,7 +164,7 @@ runTandem<-function(spectra="",fasta="",outdir=".",cpu=1,
 #' @param msfile The MS/MS data (mgf format) used.
 #' @export
 #' @return none
-#' @examples 
+#' @examples
 #' vcffile <- system.file("extdata/input", "PGA.vcf",package="PGA")
 #' bedfile <- system.file("extdata/input", "junctions.bed",package="PGA")
 #' gtffile <- system.file("extdata/input", "transcripts.gtf",package="PGA")
@@ -162,17 +175,17 @@ runTandem<-function(spectra="",fasta="",outdir=".",cpu=1,
 #' dbfile <- dbCreator(gtfFile=gtffile,vcfFile=vcffile,bedFile=bedfile,
 #'                     annotation_path=annotation,outfile_name=outfile_name,
 #'                     genome=Hsapiens,outdir=outfile_path)
-#'           
+#'
 #' msfile <- system.file("extdata/input", "pga.mgf",package="PGA")
-#' 
+#'
 #' ## X!Tandem as the peptide identification software
 #' idfile <- runTandem(spectra = msfile, fasta = dbfile, outdir = "./", cpu = 6,
 #'                     enzyme = "[KR]|[X]", varmod = "15.994915@@M",itol = 0.05,
-#'                     fixmod = "57.021464@@C", tol = 10, tolu = "ppm", 
+#'                     fixmod = "57.021464@@C", tol = 10, tolu = "ppm",
 #'                     itolu = "Daltons", miss = 2, maxCharge = 8, ti = FALSE)
 #' parserGear(file = idfile, db = dbfile, decoyPrefix="#REV#",xmx=1,thread=8,
 #'            outdir = "parser_outdir")
-#' 
+#'
 #' ## Mascot as the peptide identification software
 #' dat_file <- system.file("extdata/input", "mascot.dat",package="PGA")
 #' parserGear(file = dat_file, db = dbfile, decoyPrefix="#REV#",xmx=1,thread=8,
@@ -182,7 +195,7 @@ parserGear=function(file=NULL,db=NULL,outdir="parser_outdir",
                     novelPrefix="VAR",decoyPrefix="###REV###",
                     alignment=1,xmx=NULL,thread=1,msfile=NULL)
 {
-    
+
     ## alignment is not valid, if "file" is xml format, alignment =1.
     regx=regexpr("xml$",file,perl=TRUE);
     regd=regexpr("dat$",file,perl=TRUE);
@@ -191,17 +204,17 @@ parserGear=function(file=NULL,db=NULL,outdir="parser_outdir",
     {
         if(regx[1]!=-1)
         {
-            ph<-paste("java","-jar",
+            ph<-paste(.java.executable(),"-jar",
                       paste("\"",
                             paste(system.file("parser4PGA.jar",
                                               package="PGA"),sep="",collapse=""),
-                            "\"",sep=""),  
+                            "\"",sep=""),
                       collapse=" ",sep=" ")
             alignment=1;
         }
         else if(regd!=-1)
         {
-            ph<-paste("java","-cp",
+            ph<-paste(.java.executable(),"-cp",
                       paste("\"",
                             paste(system.file("parser4PGA.jar",
                                               package="PGA"),sep="",collapse=""),
@@ -212,7 +225,7 @@ parserGear=function(file=NULL,db=NULL,outdir="parser_outdir",
         }
         else if(regm!=-1)
         {
-            ph<-paste("java","-cp",
+            ph<-paste(.java.executable(),"-cp",
                       paste("\"",
                             paste(system.file("parser4PGA.jar",
                                               package="PGA"),sep="",collapse=""),
@@ -226,17 +239,17 @@ parserGear=function(file=NULL,db=NULL,outdir="parser_outdir",
     {
         if(regx[1]!=-1)
         {
-            ph<-paste("java",paste("-Xmx",xmx,"G",sep=""),"-jar",
+            ph<-paste(.java.executable(),paste("-Xmx",xmx,"G",sep=""),"-jar",
                       paste("\"",
                             paste(system.file("parser4PGA.jar",
                                               package="PGA"),sep="",collapse=""),
-                            "\"",sep=""), 
+                            "\"",sep=""),
                       collapse=" ",sep=" ");
             alignment=1;
         }
         if(regd[1]!=-1)
         {
-            ph<-paste("java",paste("-Xmx",xmx,"G",sep=""),"-cp",
+            ph<-paste(.java.executable(),paste("-Xmx",xmx,"G",sep=""),"-cp",
                       paste("\"",
                             paste(system.file("parser4PGA.jar",
                                               package="PGA"),sep="",collapse=""),
@@ -247,7 +260,7 @@ parserGear=function(file=NULL,db=NULL,outdir="parser_outdir",
         }
         if(regm[1]!=-1)
         {
-            ph<-paste("java",paste("-Xmx",xmx,"G",sep=""),"-cp",
+            ph<-paste(.java.executable(),paste("-Xmx",xmx,"G",sep=""),"-cp",
                       paste("\"",
                             paste(system.file("parser4PGA.jar",
                                               package="PGA"),sep="",collapse=""),
@@ -257,14 +270,14 @@ parserGear=function(file=NULL,db=NULL,outdir="parser_outdir",
             alignment=0;
         }
     }
-    
+
     if(regm[1]!=-1){
-        
+
         tandemparser=paste(ph,
-                           paste("\"",file,"\"",sep=""), 
-                           paste("\"",db,"\"",sep=""), 
-                           paste("\"",prefix,"\"",sep=""), 
-                           paste("\"",outdir,"\"",sep=""), 
+                           paste("\"",file,"\"",sep=""),
+                           paste("\"",db,"\"",sep=""),
+                           paste("\"",prefix,"\"",sep=""),
+                           paste("\"",outdir,"\"",sep=""),
                            paste('"',decoyPrefix,'"',sep=""),
                            paste('"',novelPrefix,'"',sep=""),
                            alignment,
@@ -272,20 +285,20 @@ parserGear=function(file=NULL,db=NULL,outdir="parser_outdir",
                            msfile,
                            collapse=" ",sep=" ")
     }else{
-    
+
         tandemparser=paste(ph,
-                           paste("\"",file,"\"",sep=""), 
-                           paste("\"",db,"\"",sep=""), 
-                           paste("\"",prefix,"\"",sep=""), 
-                           paste("\"",outdir,"\"",sep=""), 
+                           paste("\"",file,"\"",sep=""),
+                           paste("\"",db,"\"",sep=""),
+                           paste("\"",prefix,"\"",sep=""),
+                           paste("\"",outdir,"\"",sep=""),
                            paste('"',decoyPrefix,'"',sep=""),
                            paste('"',novelPrefix,'"',sep=""),
                            alignment,
                            thread,
                            collapse=" ",sep=" ")
     }
-    
-    
+
+
     #cat(tandemparser)
     outfile=system(command=tandemparser,intern=TRUE)
 }
@@ -295,5 +308,5 @@ parserGear=function(file=NULL,db=NULL,outdir="parser_outdir",
 check_parser=function(){
     f <- system.file("parser4PGA.jar",package="PGA")
     return(file.exists(f))
-    
+
 }
