@@ -1,0 +1,10 @@
+@article{wen2016pga,
+	title={PGA: an R/Bioconductor package for identification of novel peptides using a customized database derived from RNA-Seq},
+	author={Wen, Bo and Xu, Shaohang and Zhou, Ruo and Zhang, Bing and Wang, Xiaojing and Liu, Xin and Xu, Xun and Liu, Siqi},
+	journal={BMC bioinformatics},
+	volume={17},
+	number={1},
+	pages={1},
+	year={2016},
+	publisher={BioMed Central}
+}
