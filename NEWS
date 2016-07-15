@@ -1,13 +1,3 @@
-Version 1.3.6
-* Add citation information
-Version 1.3.5
-
-* Fixed some bugs
-* Add the funcion of constructing the Trinity protein DB
-* and the "addGeneName4Ensembl" function
-
+Version 0.1.0
 --------------
-
-Version 1.0.0
- 
-* First release version
+o First release version

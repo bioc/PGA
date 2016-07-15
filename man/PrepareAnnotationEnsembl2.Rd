@@ -31,7 +31,7 @@ function is modified from the function \code{\link{PrepareAnnotationEnsembl}} in
 }
 \examples{
 ensembl <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl",
-                    host="feb2012.archive.ensembl.org", path="/biomart/martservice",
+                    host="grch37.ensembl.org", path="/biomart/martservice",
                     archive=FALSE)
 
 annotation_path <- tempdir()
