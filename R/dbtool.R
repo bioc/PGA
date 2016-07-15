@@ -43,7 +43,7 @@ Outputaberrant2 <- function(positiontab, outfa, outmtab, coding, proteinseq,
                 sep='')
         }else  ""}))
     total[,'coding'] <- gsub('N', 'A', total[, 'coding'], fixed=TRUE) 
-    aa <- as.character(translate(DNAStringSet(total[, 'coding'])))
+    aa <- suppressWarnings(as.character(translate(DNAStringSet(total[, 'coding']))))
     
     total <- cbind(total, aa, label)
     pep <- apply(total, 1, function(x) unlist(strsplit(x['aa'], '\\*'))[1]) 
@@ -169,9 +169,9 @@ OutputNovelJun2 <- function(junction_type, genome, outfa,outmtab,
                                'coding'=as.data.frame(seqs)[, 1])
     #save(junpepcoding, file=outfile_c)
     
-    peptides_r1 <- translate(seqs)
-    peptides_r2 <- translate(subseq(seqs, start=2))
-    peptides_r3 <- translate(subseq(seqs, start=3))
+    peptides_r1 <- suppressWarnings(translate(seqs))
+    peptides_r2 <- suppressWarnings(translate(subseq(seqs, start=2)))
+    peptides_r3 <- suppressWarnings(translate(subseq(seqs, start=3)))
     
     junpos_rna_p1 <- ifelse(novel_junc_new[, 'strand'] == '+', 
                             as.numeric(novel_junc_new[, 'part1_len']), 
@@ -628,7 +628,7 @@ PrepareAnnotationEnsembl2 <- function(mart, annotation_path,
         message("Prepare exon splice information (splicemax.RData) ... ", 
                 appendLF=FALSE)
         exonByTx <- exonsBy(txdb, "tx", use.names=FALSE)
-        index <- which(elementLengths(exonByTx)==1)
+        index <- which(elementNROWS(exonByTx)==1)
         exonByTx_mul <- exonByTx[-index]
         exons_mul <- IRanges::as.data.frame(exonByTx_mul)
         exonslist <- split(exons_mul, exons_mul$group)
@@ -924,7 +924,7 @@ PrepareAnnotationRefseq2 <- function(genome='hg19', CDSfasta, pepfasta,
     if(splice_matrix){
         message("Prepare exon splice information (splicemax.RData) ... ", 
                 appendLF=FALSE)
-        index <- which(elementLengths(exonByTx)==1) 
+        index <- which(elementNROWS(exonByTx)==1) 
         exonByTx_mul <- exonByTx[-index]
         exons_mul <- IRanges::as.data.frame(exonByTx_mul)
         exonslist <- split(exons_mul, exons_mul$group) 
@@ -1628,7 +1628,7 @@ addGeneName4Ensembl <- function(mart, report="report"){
     if(file.exists(paste(report,"files/snv.tsv",sep="/"))){
         
         file<-paste(report,"files/snv.tsv",sep="/")
-        raw<-read.delim(file,head=TRUE)
+        raw<-read.delim(file,header=TRUE)
         
         protein_ids<-as.character(raw$proname)
         if(length(grep("^ENS",protein_ids[1]))>0) 
@@ -1651,7 +1651,7 @@ addGeneName4Ensembl <- function(mart, report="report"){
     if(file.exists(paste(report,"files/idl.tsv",sep="/"))){
         
         file<-paste(report,"files/idl.tsv",sep="/")
-        raw<-read.delim(file,head=TRUE)
+        raw<-read.delim(file,header=TRUE)
         
         protein_ids<-as.character(raw$proname)
         if(length(grep("^ENS",protein_ids[1]))>0)
