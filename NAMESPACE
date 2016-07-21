@@ -1,12 +1,19 @@
-import(data.table)
+importFrom(data.table,"%between%", "%chin%", "%like%", ":=",  as.data.table, between, chgroup, chmatch, chorder, CJ, copy, data.table, dcast, dcast.data.table, foverlaps,fread, haskey, key, "key<-", key2, last, like,melt, set, set2key, set2keyv, setattr, setDF, setDT, setkey, setkeyv, setnames,  setorder, setorderv)
+importFrom("grDevices", "colorRampPalette", "dev.off", "pdf", "png",
+             "rainbow")
+importFrom("graphics", "abline", "axTicks", "axis", "barplot", "box",
+             "clip", "hist", "lines", "mtext", "par", "pie", "plot",
+             "points", "rug", "text")
+importFrom("stats", "density", "rt", "setNames")
+importFrom("utils", "read.delim", "read.table", "write.table")
 import(pheatmap)
 import(RCurl)
 import(Nozzle.R1)
 import(stringr)
 import(ggplot2)
+import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
-import(S4Vectors)
 importFrom(Biostrings,
     AAStringSet, DNAStringSet, DNAStringSetList, DNA_BASES, getSeq ,
     nchar, reverseComplement, substr, translate)
