@@ -688,7 +688,7 @@ PrepareAnnotationRefseq2 <- function(genome='hg19', CDSfasta, pepfasta,
     query_refGene <- ucscTableQuery(session, "refGene", table="refGene", 
                                     names=transcript_ids)
     refGene <- getTable(query_refGene)
-    query <- ucscTableQuery(session, "refGene", table="refLink", 
+    query <- ucscTableQuery(session, "refGene", table="hgFixed.refLink", 
                             names=refGene[, 'name2'])
     reflink <- getTable(query)
     ids <- subset(reflink, mrnaAcc %in% refGene[, 'name'],select = name:protAcc)
@@ -1616,7 +1616,7 @@ dbcat<-function(fa,proteinseq,make_decoy=TRUE,var_tag="VAR",decoy_tag="#REV#",
 #'  
 #' mart <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL",
 #'         dataset="hsapiens_gene_ensembl",
-#'         host="feb2012.archive.ensembl.org", 
+#'         host="grch37.ensembl.org", 
 #'         path="/biomart/martservice",
 #'         archive=FALSE)
 #' addGeneName4Ensembl(mart=mart,report="report")

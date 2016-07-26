@@ -9,19 +9,19 @@ parserGear(file = NULL, db = NULL, outdir = "parser_outdir",
   alignment = 1, xmx = NULL, thread = 1, msfile = NULL)
 }
 \arguments{
-\item{file}{MS/MS search file. Currently, only XML format file 
-of X!Tandem, DAT result of Mascot and mzIdentML result file (MS-GF+, 
+\item{file}{MS/MS search file. Currently, only XML format file
+of X!Tandem, DAT result of Mascot and mzIdentML result file (MS-GF+,
 MyriMatch, IPeak, OMSSA, ...) are supported.}
 
-\item{db}{A FASTA format database file used for MS/MS searching. 
+\item{db}{A FASTA format database file used for MS/MS searching.
 Usually, it is from the output of the function \code{dbCreator}.}
 
 \item{outdir}{Output directory.}
 
 \item{prefix}{The prefix of output file.}
 
-\item{novelPrefix}{The prefix of novel protein ID. Default is "VAR". 
-"VAR" is the prefix which used by function \code{dbCreator}. This value 
+\item{novelPrefix}{The prefix of novel protein ID. Default is "VAR".
+"VAR" is the prefix which used by function \code{dbCreator}. This value
 should be left to the default when your database is constructed by
 the function \code{getTrinityDB}.}
 
@@ -44,7 +44,7 @@ Default is 1.}
 none
 }
 \description{
-This function is mainly for q-value calculation, 
+This function is mainly for q-value calculation,
 protein inference and novel peptides spectra annotation.
 }
 \examples{
@@ -58,13 +58,13 @@ library(BSgenome.Hsapiens.UCSC.hg19)
 dbfile <- dbCreator(gtfFile=gtffile,vcfFile=vcffile,bedFile=bedfile,
                     annotation_path=annotation,outfile_name=outfile_name,
                     genome=Hsapiens,outdir=outfile_path)
-          
+
 msfile <- system.file("extdata/input", "pga.mgf",package="PGA")
 
 ## X!Tandem as the peptide identification software
 idfile <- runTandem(spectra = msfile, fasta = dbfile, outdir = "./", cpu = 6,
                     enzyme = "[KR]|[X]", varmod = "15.994915@M",itol = 0.05,
-                    fixmod = "57.021464@C", tol = 10, tolu = "ppm", 
+                    fixmod = "57.021464@C", tol = 10, tolu = "ppm",
                     itolu = "Daltons", miss = 2, maxCharge = 8, ti = FALSE)
 parserGear(file = idfile, db = dbfile, decoyPrefix="#REV#",xmx=1,thread=8,
            outdir = "parser_outdir")

@@ -25,7 +25,7 @@ library(PGA)
  
 mart <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL",
         dataset="hsapiens_gene_ensembl",
-        host="feb2012.archive.ensembl.org", 
+        host="grch37.ensembl.org", 
         path="/biomart/martservice",
         archive=FALSE)
 addGeneName4Ensembl(mart=mart,report="report")

@@ -18,7 +18,7 @@ runTandem(spectra = "", fasta = "", outdir = ".", cpu = 1,
 
 \item{cpu}{The number of CPU used for X!Tandem search. Default is 1.}
 
-\item{enzyme}{Specification of specific protein cleavage sites. 
+\item{enzyme}{Specification of specific protein cleavage sites.
 Default is "[KR]|[X]".}
 
 \item{tol}{Parent ion mass tolerance (monoisotopic mass).}
@@ -37,7 +37,7 @@ Default is "[KR]|[X]".}
 
 \item{maxCharge}{The Maximum parent charge, default is 8}
 
-\item{ti}{anticipate carbon isotope parent ion assignment errors. 
+\item{ti}{anticipate carbon isotope parent ion assignment errors.
 Default is false.}
 }
 \value{
@@ -57,7 +57,7 @@ library(BSgenome.Hsapiens.UCSC.hg19)
 dbfile <- dbCreator(gtfFile=gtffile,vcfFile=vcffile,bedFile=bedfile,
                     annotation_path=annotation,outfile_name=outfile_name,
                     genome=Hsapiens,outdir=outfile_path)
-          
+
 msfile <- system.file("extdata/input", "pga.mgf",package="PGA")
 runTandem(spectra = msfile, fasta = dbfile, outdir = "./", cpu = 6,
           enzyme = "[KR]|[X]", varmod = "15.994915@M",
