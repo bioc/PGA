@@ -35,6 +35,7 @@ Outputaberrant2 <- function(positiontab, outfa, outmtab, coding, proteinseq,
         as.character(reverseComplement(DNAStringSet(mtab_minus[, 'varbase'])))
     
     total <- rbind(mtab_plus,mtab_minus) 
+    total<-subset(total,!is.na(coding),)  # added in 20161027, some protein ids didn't have the corresponding coding sequence. Therefore, the DNAStringSet would get the error.
     
     label <- unlist(lapply(total[,'coding'], function(x){
         if(grepl ('N',x,fixed=TRUE)){
