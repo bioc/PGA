@@ -997,11 +997,11 @@ getNovelTx=function(gffFile="transcripts.gtf",
     #justify the chromosomes are ucsc format or ensembl format
     if(any(c(1:22, "X", "Y") %in% seqlevels(novel_gff))){
         # restricting this extraction to the 24 chromosomes
-        seqlevels(novel_gff, force=TRUE) <- c(1:22, "X", "Y")  
+        seqlevels(novel_gff, pruning.mode="coarse") <- c(1:22, "X", "Y")  
         seqlevels(novel_gff) <- paste0("chr", seqlevels(novel_gff))  # rename
     }else{
-        seqlevels(novel_gff, force=TRUE) <- paste("chr",c(1:22, "X", "Y"),
-                                                  sep="")
+        seqlevels(novel_gff, pruning.mode="coarse") <-
+                                paste("chr",c(1:22, "X", "Y"), sep="")
     }
     
     novel_tx<-novel_gff[novel_gff$type=="transcript"]
@@ -1046,7 +1046,7 @@ getNovelTx=function(gffFile="transcripts.gtf",
     #if(any(c(1:22, "X", "Y") %in% seqlevels(transcripts)))  
     #{
     # restricting this extraction to the 24 chromosomes
-    #seqlevels(transcripts, force=TRUE) <- c(1:22, "X", "Y")  
+    #seqlevels(transcripts, pruning.mode="coarse") <- c(1:22, "X", "Y")  
     #seqlevels(transcripts) <- paste0("chr", seqlevels(transcripts))  # rename
     #}
     ## Extract the transcript sequences from the genome:
