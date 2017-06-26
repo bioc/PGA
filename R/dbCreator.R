@@ -64,14 +64,22 @@ dbCreator <- function(gtfFile=NULL,vcfFile=NULL,bedFile=NULL,annotation_path=NUL
     ## InputVcf {customProDB}
     ## The InputVcf() function generates a list of GRanges object from a single 
     ## VCF file.
-    vcf <- InputVcf(vcfFile)
-    #table(values(vcf[[1]])[['INDEL']])
+	if(!is.null(vcfFile))
+	{
+    	vcf <- InputVcf(vcfFile)
+    	#table(values(vcf[[1]])[['INDEL']])
     
-    idx_snv <- which(values(vcf[[1]])[['INDEL']] == FALSE)
-    SNVvcf <- vcf[[1]][idx_snv]
-    idx_indel <- which(values(vcf[[1]])[['INDEL']] == TRUE)
-    indelvcf <- vcf[[1]][idx_indel]
-    
+    	idx_snv <- which(values(vcf[[1]])[['INDEL']] == FALSE)
+    	SNVvcf <- vcf[[1]][idx_snv]
+    	idx_indel <- which(values(vcf[[1]])[['INDEL']] == TRUE)
+    	indelvcf <- vcf[[1]][idx_indel]
+	}
+	else
+	{
+		SNVvcf<-NULL
+		indelvcf<-NULL
+	}
+	
     if(length(indelvcf) >=1){
         
         message("Output abberant protein FASTA file caused by short INDEL... ",
