@@ -1,3 +1,7 @@
+Version 1.8.1
+
+o As the "getTable()" of rtracklayer would produce a Bad Request error. We temporarily disabled the code checking of the "PrepareAnnotationRefseq2" function until the bug had been fixed. Please use the "PrepareAnnotationEnsembl2" to prepare the annotation file instead of "PrepareAnnotationRefseq2".
+
 Version 1.5.1
 
 o Fix the bug in Outputaberrant2

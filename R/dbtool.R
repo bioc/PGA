@@ -659,7 +659,8 @@ PrepareAnnotationEnsembl2 <- function(mart, annotation_path,
 #' @return Several .RData file containing annotations needed for following analysis.
 #' @seealso \code{\link{PrepareAnnotationEnsembl2}}.
 #' @export
-#' @examples 
+#' @examples
+#' \dontrun{
 #' transcript_ids <- c("NM_001126112", "NM_033360", "NR_073499")
 #' pepfasta <- system.file("extdata", "refseq_pro_seq.fasta",
 #'                         package="customProDB")
@@ -669,6 +670,7 @@ PrepareAnnotationEnsembl2 <- function(mart, annotation_path,
 #' PrepareAnnotationRefseq2(genome='hg19', CDSfasta, pepfasta, annotation_path,
 #'                         dbsnp=NULL, transcript_ids=transcript_ids,
 #'                         splice_matrix=FALSE, COSMIC=FALSE)
+#' }
 PrepareAnnotationRefseq2 <- function(genome='hg19', CDSfasta, pepfasta, 
                                      annotation_path, dbsnp=NULL, 
                                      transcript_ids=NULL, splice_matrix=FALSE, 
