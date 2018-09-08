@@ -730,17 +730,16 @@ PrepareAnnotationRefseq2 <- function(genome='hg19', CDSfasta, pepfasta,
     
     message("Prepare gene/transcript/protein id mapping information (ids.RData) ... ", 
             appendLF=FALSE)
-    
-    query_refGene <- ucscTableQuery(session, "refGene", table="refGene", 
-                                    names=transcript_ids)
+
+    query_refGene <- ucscTableQuery(session, "refSeqComposite", table="refGene")
     refGene <- getTable(query_refGene)
-    query <- ucscTableQuery(session, "refGene", table="hgFixed.refLink", 
-                            names=refGene[, 'name2'])
-    reflink <- getTable(query)
-    ids <- subset(reflink, mrnaAcc %in% refGene[, 'name'],select = name:protAcc)
+    refGene <- subset(refGene, name %in% transcript_ids)
+    
+    reflink <- .UCSC_dbselect("hgFixed", "refLink")
+    ids <- subset(reflink, mrnaAcc %in% refGene[, 'name'], select = name:protAcc)
     colnames(ids) <- c('gene_name', 'description', 'tx_name', 'pro_name')
     save(ids, file=paste(annotation_path, '/ids.RData', sep=''))
-    packageStartupMessage(" done")
+    packageStartupMessage(" done")    
     
     #tr_coding <- subset(ids,pro_name!="")
     #tr_noncoding <- subset(ids,pro_name == "")
@@ -1715,4 +1714,25 @@ addGeneName4Ensembl <- function(mart, report="report"){
             message("........ No conversion is required\n", appendLF=FALSE)
         }
     }
+}
+
+
+### See https://genome.ucsc.edu/goldenpath/help/mysql.html for how to connect
+### to a MySQL server at UCSC. By default UCSC_dbselect() uses the server
+### located on the US west coast.
+.UCSC_dbselect <- function(dbname, from, columns=NULL, where=NULL,
+                           server="genome-mysql.soe.ucsc.edu")
+{
+    columns <- if (is.null(columns)) "*" else paste0(columns, collapse=",")
+    SQL <- sprintf("SELECT %s FROM %s", columns, from)
+    if (!is.null(where)) {
+        stopifnot(isSingleString(where))
+        SQL <- paste(SQL, "WHERE", where)
+    }
+    dbconn <- dbConnect(RMariaDB::MariaDB(), dbname=dbname,
+                        username="genome",
+                        host=server,
+                        port=3306)
+    on.exit(dbDisconnect(dbconn))
+    dbGetQuery(dbconn, SQL)
 }
