@@ -7,8 +7,8 @@ Description: This package provides functions for construction of customized
     searching, post-processing and report generation. This kind of customized
     protein database includes both the reference database (such as Refseq or
     ENSEMBL) and the novel peptide sequences form RNA-Seq data.
-Version: 1.13.0
-Date: 2018-09-08
+Version: 1.13.1
+Date: 2018-11-30
 Author: Shaohang Xu, Bo Wen
 Maintainer: Bo Wen <wenbostar@gmail.com>, Shaohang Xu <xsh.skye@gmail.com>
 Depends:
@@ -44,6 +44,7 @@ Suggests:
 VignetteBuilder: knitr
 License: GPL-2
 biocViews: Proteomics,
+	ImmunoOncology,
     MassSpectrometry,
     Software,
     ReportWriting,
