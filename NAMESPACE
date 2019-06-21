@@ -14,7 +14,7 @@ import(ggplot2)
 import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
-importFrom(Biostrings,
+importFrom(Biostrings,DNAString,
     AAStringSet, DNAStringSet, DNAStringSetList, DNA_BASES, getSeq ,
     nchar, reverseComplement, substr, translate)
 import(Rsamtools)
@@ -35,7 +35,11 @@ importFrom(customProDB,aaVariation,Bed2Range,InputVcf,JunctionType,
            OutputVarproseq_single,Positionincoding,
            PrepareAnnotationEnsembl,Varlocation)
 importFrom(rTANDEM, rTParam, rTTaxo, setParamValue, tandem)
-
+importFrom(dplyr, "%>%", filter, select, arrange, row_number, 
+           distinct, group_by,rowwise,mutate,ungroup,bind_rows)
+importFrom(processx,run)
+importFrom(readr,write_tsv)
+importFrom(seqinr,write.fasta)
 
 export(dbCreator)
 export(reportGear)
@@ -46,3 +50,6 @@ export(PrepareAnnotationEnsembl2)
 export(PrepareAnnotationRefseq2)
 export(createProDB4DenovoRNASeq)
 export(addGeneName4Ensembl)
+export(buildTargetDecoyDB)
+export(buildFusionProteinDB)
+

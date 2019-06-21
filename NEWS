@@ -1,3 +1,13 @@
+Version 1.15.1
+
+o Implementation for the protein database construction from fusion events(buildFusionProteinDB). Currently, this function only supports the calling result from STAR-fusion.
+
+Version 1.14.1
+
+o Add a parameter to set FDR
+o Update parser program
+
+V
 Version 1.13.3
 
 o Fix bug in function reportGear.R
