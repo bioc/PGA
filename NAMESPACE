@@ -50,6 +50,5 @@ export(PrepareAnnotationEnsembl2)
 export(PrepareAnnotationRefseq2)
 export(createProDB4DenovoRNASeq)
 export(addGeneName4Ensembl)
-export(buildTargetDecoyDB)
 export(buildFusionProteinDB)
 

@@ -4,17 +4,15 @@
 \alias{buildFusionProteinDB}
 \title{Create customized protein database from fusion events}
 \usage{
-buildFusionProteinDB(x, species = "Homo sapiens",
-  genome_version = "hg38", fusion_method = "STAR-Fusion",
-  max_nt = 100, out_dir = "./", prefix = "fusion",
-  translating_method = "six_frame", min_aa_length = 10)
+buildFusionProteinDB(x, genome = Hsapiens,
+  fusion_method = "STAR-Fusion", max_nt = 100, out_dir = "./",
+  prefix = "fusion", translating_method = "six_frame",
+  min_aa_length = 10)
 }
 \arguments{
 \item{x}{A tsv format file which contains fusion events.}
 
-\item{species}{Species, default is "Homo sapiens"}
-
-\item{genome_version}{Genome version, default is "hg38"}
+\item{genome}{Genome information. This is a BSgenome object(e.g. Hsapiens).}
 
 \item{fusion_method}{Fusion calling method, default is "STAR-Fusion"}
 
@@ -39,5 +37,6 @@ Create customized protein database from fusion events
 \examples{
 fusion_file <- system.file("extdata/fusion/", "star-fusion_example_input.tsv",package="PGA")
 # This example input was downloaded from STAR-Fusion website (https://github.com/STAR-Fusion/STAR-Fusion/wiki)
-res <- buildFusionProteinDB(fusion_file,genome_version="hg19")
+library("BSgenome.Hsapiens.UCSC.hg19")  # or library("BSgenome.Hsapiens.UCSC.hg38")
+res <- buildFusionProteinDB(fusion_file, genome=Hsapiens)
 }

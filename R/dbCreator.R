@@ -288,11 +288,12 @@ buildTargetDecoyDB=function(db,cont_file=NULL,decoyPrefix="###REV###",
     return(seq)
 }
 
+## @param genome_version Genome version, default is "hg38"   
+## @param species Species, default is "Homo sapiens"
+
 ##' @title Create customized protein database from fusion events
 ##' @description Create customized protein database from fusion events
 ##' @param x A tsv format file which contains fusion events.
-##' @param species Species, default is "Homo sapiens"
-##' @param genome_version Genome version, default is "hg38"
 ##' @param fusion_method Fusion calling method, default is "STAR-Fusion"
 ##' @param max_nt The max length of DNA sequences to be extracted for each side,
 ##' default is 60
@@ -301,38 +302,41 @@ buildTargetDecoyDB=function(db,cont_file=NULL,decoyPrefix="###REV###",
 ##' @param translating_method Translating DNA to protein (six_frame,three_frame,
 ##' longest), default is six_frame.
 ##' @param min_aa_length The minimum length of proteins, default is 10 aa.
+##' @param genome Genome information. This is a BSgenome object(e.g. Hsapiens). 
 ##' @export
 ##' @return The database file
 ##' @examples 
 ##' fusion_file <- system.file("extdata/fusion/", "star-fusion_example_input.tsv",package="PGA")
 ##' # This example input was downloaded from STAR-Fusion website (https://github.com/STAR-Fusion/STAR-Fusion/wiki)
-##' res <- buildFusionProteinDB(fusion_file,genome_version="hg19")
-buildFusionProteinDB=function(x, species="Homo sapiens",genome_version="hg38",
+##' library("BSgenome.Hsapiens.UCSC.hg19")  # or library("BSgenome.Hsapiens.UCSC.hg38")
+##' res <- buildFusionProteinDB(fusion_file, genome=Hsapiens)
+buildFusionProteinDB=function(x, genome=Hsapiens,
+							  #genome_version="hg38",
                               fusion_method="STAR-Fusion",
                               max_nt=100,out_dir="./",prefix="fusion",
                               translating_method="six_frame",
                               min_aa_length=10){
     
-    if(species == "Homo sapiens"){
-        if(genome_version == "hg38"){
-            if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg38", quietly = TRUE)){
-                BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")
-            }
-            library("BSgenome.Hsapiens.UCSC.hg38")
-            genome <- Hsapiens
-        }else if(genome_version == "hg19"){
-            if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)){
-                BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
-            }
-            library("BSgenome.Hsapiens.UCSC.hg19")
-            genome <- Hsapiens
-        }else{
-            stop(paste("Currently, we don't support genome version:", genome_version,"\n",sep=""))
-        }
-    }else{
-        stop(paste("Currently, we don't support species:", species,"\n",sep=""))
-    }
-    
+#    if(species == "Homo sapiens"){
+#        if(genome_version == "hg38"){
+#            if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg38", quietly = TRUE)){
+#                BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")
+#            }
+#            library("BSgenome.Hsapiens.UCSC.hg38")
+#            genome <- Hsapiens
+#        }else if(genome_version == "hg19"){
+#            if (!requireNamespace("BSgenome.Hsapiens.UCSC.hg19", quietly = TRUE)){
+#                BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
+#            }
+#            library("BSgenome.Hsapiens.UCSC.hg19")
+#            genome <- Hsapiens
+#        }else{
+#            stop(paste("Currently, we don't support genome version:", genome_version,"\n",sep=""))
+#        }
+#    }else{
+#        stop(paste("Currently, we don't support species:", species,"\n",sep=""))
+#    }
+#    
     # the max length of flanking DNA sequence
     nalen <- max_nt
     dat <- read.delim(x,stringsAsFactors = FALSE,check.names = FALSE)
